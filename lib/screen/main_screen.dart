@@ -140,17 +140,24 @@ class _MainScreenState extends State<MainScreen> {
                                       DataRow(cells: [
                                         DataCell(
                                             Text('Tổng giá trị\ncổ phiếu lớn')),
-                                        DataCell(Text('')),
-                                        DataCell(Text('')),
+                                        DataCell(SizedBox.shrink()),
+                                        DataCell(SizedBox.shrink()),
                                         DataCell(Text(stockHoldingList
                                             .map((e) => e.totalNetValueVnd ?? 0)
                                             .sum
                                             .formatVND())),
                                       ]),
                                       DataRow(cells: [
-                                        DataCell(Text('Tổng giá trị\nnắm giữ')),
-                                        DataCell(Text('')),
-                                        DataCell(Text('')),
+                                        DataCell(Text('Tiền mặt')),
+                                        DataCell(SizedBox.shrink()),
+                                        DataCell(SizedBox.shrink()),
+                                        DataCell(Text(
+                                            allData!.totalCash.formatVND())),
+                                      ]),
+                                      DataRow(cells: [
+                                        DataCell(Text('Tổng tài sản')),
+                                        DataCell(SizedBox.shrink()),
+                                        DataCell(SizedBox.shrink()),
                                         DataCell(Text(stockController
                                             .allData.totalValue
                                             .formatVND())),

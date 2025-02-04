@@ -15,6 +15,7 @@ class AllData {
   Map<int, FundNav>? fundNavs;
   MyFunds? myFunds;
   List<StockHolding> myHoldingStocks = <StockHolding>[];
+  double totalCash = 0;
 
   double get totalValue {
     if (myFunds == null || fundDetails == null) return 0;
@@ -44,9 +45,9 @@ class AllData {
     });
     myFunds = MyFunds.fromJson(json['myFunds']);
     // sort myFunds base on totalValueHolding
-    myFunds!.data!
-        .sort((a, b) => b.totalValueHolding!.compareTo(a.totalValueHolding!));
+    myFunds!.data!.sort((a, b) => b.gain!.compareTo(a.gain!));
     calculateMyHoldingStocks();
+    calculateTotalCash();
   }
 
   // toJson
@@ -64,6 +65,36 @@ class AllData {
     });
     data['myFunds'] = myFunds!.toJson();
     return data;
+  }
+
+  void calculateTotalCash() {
+    if (fundDetails == null || myFunds == null) {
+      return;
+    }
+    for (int i = 0; i < myFunds!.data!.length; i++) {
+      // Calculate each fund i have
+      final myFund = myFunds!.data![i];
+      debugPrint(
+          'Calculating Funds ${myFund.product?.shortName} has value ${myFund.totalValueHolding.formatVND()},');
+
+      // total value of fund in VND
+      final fundValueVnd = myFund.totalValueHolding ?? 0;
+
+      final fundHoldinglist =
+          fundDetails!.values.map((e) => e.data).nonNulls.toList();
+
+      for (var fund in fundHoldinglist) {
+        if (fund.id == myFund.productId) {
+          final cashPercent = fund.productAssetHoldingList
+                  ?.firstWhereOrNull(
+                      (element) => element.assetType?.code == 'CASH')
+                  ?.assetPercent ??
+              0;
+          final cash = cashPercent * fundValueVnd / 100;
+          totalCash += cash;
+        }
+      }
+    }
   }
 
   void calculateMyHoldingStocks() {
