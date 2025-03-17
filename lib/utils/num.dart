@@ -11,4 +11,10 @@ extension NumExtension on num? {
       return result;
     }
   }
+
+  String formatVNDMillions() {
+    if (this == null) return '';
+    final millions = this! / 1000000;
+    return '${millions.round()} triệu';
+  }
 }

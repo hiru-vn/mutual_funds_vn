@@ -17,12 +17,10 @@ class StockController {
   StockController(this.apiService);
 
   Future<bool> initialize({bool forceFetch = false}) async {
-    final lastFetchStr = await SharedPreferencesService.getString(
-        SharedPreferencesService.keyDateFetched);
-    final lastFetch =
-        lastFetchStr != null ? DateTime.tryParse(lastFetchStr) : null;
-    final allDataStr = await SharedPreferencesService.getString(
-        SharedPreferencesService.allData);
+    final lastFetchStr =
+        await SharedPreferencesService.getString(SharedPreferencesService.keyDateFetched);
+    final lastFetch = lastFetchStr != null ? DateTime.tryParse(lastFetchStr) : null;
+    final allDataStr = await SharedPreferencesService.getString(SharedPreferencesService.allData);
     if (lastFetch == null ||
         lastFetch.isSameDay(DateTime.now()) == false ||
         allDataStr == null ||
@@ -45,16 +43,15 @@ class StockController {
         }
       }
 
-      // for (final product in allData.myFunds!.data!) {
-      //   final productId = product.productId?.toInt();
-      //   if (productId != null) {
-      //     final fromDate = DateTime.now().subtract(const Duration(days: 30));
-      //     final toDate = DateTime.now();
-      //     allData.fundNavs?[productId] =
-      //         await getNavHistory(productId, fromDate.toIso8601String(),
-      //             toDate.toIso8601String());
-      //   }
-      // }
+      for (final product in allData.myFunds!.data!) {
+        final productId = product.productId?.toInt();
+        if (productId != null) {
+          final fromDate = DateTime.now().subtract(const Duration(days: 30));
+          final toDate = DateTime.now();
+          allData.fundNavs?[productId] =
+              await getNavHistory(productId, fromDate.toIso8601String(), toDate.toIso8601String());
+        }
+      }
 
       allData.calculateMyHoldingStocks();
 
@@ -90,10 +87,8 @@ class StockController {
     }
   }
 
-  Future<FundNav> getNavHistory(
-      int productId, String fromDate, String toDate) async {
-    final response =
-        await apiService.getNavHistory(productId, fromDate, toDate);
+  Future<FundNav> getNavHistory(int productId, String fromDate, String toDate) async {
+    final response = await apiService.getNavHistory(productId, fromDate, toDate);
     if (response.statusCode == 200) {
       return FundNav.fromJson(jsonDecode(response.body));
     } else {

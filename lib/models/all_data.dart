@@ -16,6 +16,7 @@ class AllData {
   MyFunds? myFunds;
   List<StockHolding> myHoldingStocks = <StockHolding>[];
   double totalCash = 0;
+  List<IndustryHolding> myIndustryHoldings = <IndustryHolding>[];
 
   double get totalValue {
     if (myFunds == null || fundDetails == null) return 0;
@@ -80,14 +81,12 @@ class AllData {
       // total value of fund in VND
       final fundValueVnd = myFund.totalValueHolding ?? 0;
 
-      final fundHoldinglist =
-          fundDetails!.values.map((e) => e.data).nonNulls.toList();
+      final fundHoldinglist = fundDetails!.values.map((e) => e.data).nonNulls.toList();
 
       for (var fund in fundHoldinglist) {
         if (fund.id == myFund.productId) {
           final cashPercent = fund.productAssetHoldingList
-                  ?.firstWhereOrNull(
-                      (element) => element.assetType?.code == 'CASH')
+                  ?.firstWhereOrNull((element) => element.assetType?.code == 'CASH')
                   ?.assetPercent ??
               0;
           final cash = cashPercent * fundValueVnd / 100;
@@ -125,12 +124,11 @@ class AllData {
         for (int j = 0; j < stockHoldingList.length; j++) {
           final stockHolding = stockHoldingList[j];
           // Valud = stock percent of fund * fund value
-          stockHolding.totalValueVnd =
-              stockHolding.netAssetPercent! * fundValueVnd / 100;
+          stockHolding.totalValueVnd = stockHolding.netAssetPercent! * fundValueVnd / 100;
 
           // Check if this stock is already in the list
-          final stockIndex = result.indexWhere(
-              (element) => element.stockCode == stockHolding.stockCode);
+          final stockIndex =
+              result.indexWhere((element) => element.stockCode == stockHolding.stockCode);
 
           // assign stock to result list
           final stock = stockIndex == -1 ? null : result[stockIndex];
@@ -145,8 +143,7 @@ class AllData {
           } else {
             // Update stock price
             stock.numberOfFunds++;
-            stock.totalNetValueVnd =
-                (stock.totalNetValueVnd) + (stockHolding.totalValueVnd ?? 0);
+            stock.totalNetValueVnd = (stock.totalNetValueVnd) + (stockHolding.totalValueVnd ?? 0);
             debugPrint(
                 'Find stock ${stockHolding.stockCode} at price ${stockHolding.totalValueVnd.formatVND()}');
           }
@@ -155,16 +152,70 @@ class AllData {
     }
     // Format netAssetPercent to 2 decimal places
     for (int k = 0; k < result.length; k++) {
-      result[k].totalNetValueVnd =
-          num.parse(result[k].totalNetValueVnd.toStringAsFixed(2));
+      result[k].totalNetValueVnd = num.parse(result[k].totalNetValueVnd.toStringAsFixed(2));
 
-      result[k].percentOfAllHoldings =
-          (result[k].totalNetValueVnd / totalValue * 100);
+      result[k].percentOfAllHoldings = (result[k].totalNetValueVnd / totalValue * 100);
       // sort by totalNetValueVnd
-      result.sort((a, b) => b.totalNetValueVnd.compareTo(a.totalNetValueVnd));
     }
+    result.sort((a, b) => b.totalNetValueVnd.compareTo(a.totalNetValueVnd));
     myHoldingStocks = result;
   }
+
+  void calculateIndustryHoldings() {
+    if (fundDetails == null || myFunds == null) {
+      myIndustryHoldings = [];
+      return;
+    }
+
+    final Map<String, IndustryHolding> industryMap = {};
+
+    for (final myFund in myFunds!.data!) {
+      final fundValueVnd = myFund.totalValueHolding ?? 0;
+
+      final fundDetail = fundDetails!.values
+          .map((e) => e.data)
+          .firstWhereOrNull((element) => element?.id == myFund.productId);
+
+      if (fundDetail?.productIndustriesHoldingList != null) {
+        for (final industry in fundDetail!.productIndustriesHoldingList!) {
+          if (industry.industry == null) continue;
+
+          final value = (industry.assetPercent ?? 0) * fundValueVnd / 100;
+
+          if (industryMap.containsKey(industry.industry)) {
+            industryMap[industry.industry]!.value += value;
+          } else {
+            industryMap[industry.industry!] = IndustryHolding(
+              name: industry.industry!,
+              value: value,
+            );
+          }
+        }
+      }
+    }
+
+    myIndustryHoldings = industryMap.values.toList();
+
+    // Calculate percentages
+    final total = myIndustryHoldings.fold(0.0, (sum, ind) => sum + ind.value);
+    for (var industry in myIndustryHoldings) {
+      industry.percentage = (industry.value / total * 100);
+    }
+
+    // Sort by value descending
+    myIndustryHoldings.sort((a, b) => b.value.compareTo(a.value));
+  }
+}
+
+class IndustryHolding {
+  final String name;
+  double value;
+  double percentage = 0;
+
+  IndustryHolding({
+    required this.name,
+    this.value = 0,
+  });
 }
 
 class StockHolding {
@@ -176,6 +227,7 @@ class StockHolding {
   num totalNetValueVnd = 0;
   num percentOfAllHoldings = 0;
   int numberOfFunds = 0;
+  ProductTopHoldingList? productTopHoldingList;
 
   StockHolding({
     this.id,
@@ -191,6 +243,7 @@ class StockHolding {
     price = json['price'];
     industry = json['industry'];
     type = json['type'];
+    productTopHoldingList = ProductTopHoldingList.fromJson(json);
   }
 
   Map<String, dynamic> toJson() {
