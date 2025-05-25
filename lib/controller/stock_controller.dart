@@ -16,7 +16,7 @@ class StockController {
 
   StockController(this.apiService);
 
-  Future<bool> initialize({bool forceFetch = false}) async {
+  Future<bool> initialize({bool forceFetch = true}) async {
     final lastFetchStr =
         await SharedPreferencesService.getString(SharedPreferencesService.keyDateFetched);
     final lastFetch = lastFetchStr != null ? DateTime.tryParse(lastFetchStr) : null;
