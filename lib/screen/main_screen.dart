@@ -115,7 +115,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 child: CustomScrollView(
                   controller: _scrollController,
                   slivers: [
-                    // Modern App Bar
+                    //  App Bar
                     SliverAppBar(
                       expandedHeight: 120,
                       floating: false,
@@ -162,20 +162,20 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                             constraints: const BoxConstraints(maxWidth: 1400),
                             child: Column(
                               children: [
-                                // Modern Summary Cards
-                                _buildModernSummarySection(stockHoldingList),
+                                //  Summary Cards
+                                _buildSummarySection(stockHoldingList),
                                 const SizedBox(height: 32),
 
-                                // Modern Stocks Table
-                                _buildModernStocksSection(stockHoldingList),
+                                //  Stocks Table
+                                _buildStocksSection(stockHoldingList),
                                 const SizedBox(height: 32),
 
-                                // Modern Funds Grid
-                                _buildModernFundsSection(isWideScreen),
+                                //  Funds Grid
+                                _buildFundsSection(isWideScreen),
                                 const SizedBox(height: 32),
 
-                                // Modern Charts Section
-                                _buildModernChartsSection(isWideScreen),
+                                //  Charts Section
+                                _buildChartsSection(isWideScreen),
                                 const SizedBox(height: 32),
                               ],
                             ),
@@ -190,7 +190,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildModernSummarySection(List<StockHolding> stockHoldingList) {
+  Widget _buildSummarySection(List<StockHolding> stockHoldingList) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -237,7 +237,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           Row(
             children: [
               Expanded(
-                child: _buildModernSummaryCard(
+                child: _buildSummaryCard(
                   'Total Assets',
                   stockController.allData.totalValue.formatVND(),
                   Icons.account_balance_wallet_outlined,
@@ -246,7 +246,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildModernSummaryCard(
+                child: _buildSummaryCard(
                   'Cash Balance',
                   allData!.totalCash.formatVND(),
                   Icons.payments_outlined,
@@ -255,7 +255,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildModernSummaryCard(
+                child: _buildSummaryCard(
                   'Stock Holdings',
                   stockHoldingList.map((e) => e.totalNetValueVnd).sum.formatVND(),
                   Icons.trending_up_outlined,
@@ -269,7 +269,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildModernSummaryCard(
+  Widget _buildSummaryCard(
       String title, String value, IconData icon, List<Color> gradientColors) {
     return Container(
       padding: const EdgeInsets.all(24),
@@ -322,7 +322,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildModernStocksSection(List<StockHolding> stockHoldingList) {
+  Widget _buildStocksSection(List<StockHolding> stockHoldingList) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -651,7 +651,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildModernFundsSection(bool isWideScreen) {
+  Widget _buildFundsSection(bool isWideScreen) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -723,7 +723,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               itemCount: allData?.myFunds?.data?.length ?? 0,
               itemBuilder: (context, index) {
                 final fund = allData!.myFunds!.data![index];
-                return _buildModernFundCard(fund);
+                return _buildFundCard(fund);
               },
             ),
           ],
@@ -732,7 +732,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildModernFundCard(MyFundsData fund) {
+  Widget _buildFundCard(MyFundsData fund) {
     final fundDetail = allData?.fundDetails?[fund.productId?.toInt()]?.data;
     final myHoldings = allData?.myFunds?.data?.firstWhereOrNull(
       (element) => element.productId == fund.productId,
@@ -852,12 +852,12 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               ),
             ),
             const SizedBox(height: 12),
-            _buildModernTileValue(
+            _buildTileValue(
               'Số lượng',
               '${myHoldings?.totalValueHolding?.formatVND()}',
             ),
             const SizedBox(height: 8),
-            _buildModernTileValue(
+            _buildTileValue(
               'Lãi/Lỗ',
               '${myHoldings?.gain?.formatVND()} (${myHoldings?.gainPercent}%)',
               valueColor:
@@ -869,7 +869,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildModernTileValue(String title, String value, {Color? valueColor}) {
+  Widget _buildTileValue(String title, String value, {Color? valueColor}) {
     return Row(
       children: [
         Text(
@@ -896,7 +896,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildModernChartsSection(bool isWideScreen) {
+  Widget _buildChartsSection(bool isWideScreen) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -965,7 +965,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
-                            child: _buildModernChartSection(
+                            child: _buildChartSection(
                               'Fund Distribution',
                               PieChart(PieChartData(
                                 sections: _createPieSections(),
@@ -978,7 +978,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                           ),
                           const SizedBox(width: 24),
                           Expanded(
-                            child: _buildModernChartSection(
+                            child: _buildChartSection(
                               'Stock Distribution',
                               PieChart(PieChartData(
                                 sections: _createStockSections(),
@@ -994,7 +994,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     else
                       Column(
                         children: [
-                          _buildModernChartSection(
+                          _buildChartSection(
                             'Fund Distribution',
                             PieChart(PieChartData(
                               sections: _createPieSections(),
@@ -1005,7 +1005,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                             _createLegends(),
                           ),
                           const SizedBox(height: 32),
-                          _buildModernChartSection(
+                          _buildChartSection(
                             'Stock Distribution',
                             PieChart(PieChartData(
                               sections: _createStockSections(),
@@ -1018,7 +1018,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                         ],
                       ),
                     const SizedBox(height: 32),
-                    _buildModernChartSection(
+                    _buildChartSection(
                       'Industry Distribution',
                       PieChart(PieChartData(
                         sections: _createIndustrySections(),
@@ -1038,7 +1038,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildModernChartSection(String title, Widget chart, List<Widget> legends) {
+  Widget _buildChartSection(String title, Widget chart, List<Widget> legends) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
